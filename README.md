@@ -1,45 +1,74 @@
-# TrainerApp
+# TrainMate
 
-A modern training application built with Next.js, TypeScript, and Tailwind CSS.
+Um aplicativo moderno para acompanhamento de treinos e corridas, construído com Next.js, TypeScript e Tailwind CSS.
+
+## Funcionalidades
+
+- 🏋️ **Treinos Personalizados** - Exercícios organizados por grupos musculares
+- 📊 **Acompanhamento de Progresso** - Monitore sua jornada fitness
+- 🌍 **Multilíngue** - Suporte a Português, Inglês e Espanhol
+- 🎨 **Design Moderno** - Interface energética e motivacional
 
 ## Tech Stack
 
 - **Next.js 15** with App Router
-- **TypeScript** for type safety
-- **Tailwind CSS** for styling
-- **ESLint** for code quality
+- **TypeScript** para type safety
+- **Tailwind CSS** para styling
+- **next-intl** para internacionalização
+- **ESLint** para qualidade de código
 
-## Getting Started
+## Começando
 
-First, run the development server:
+Primeiro, execute o servidor de desenvolvimento:
 
 ```bash
 npm run dev
-# or
+# ou
 yarn dev
-# or
+# ou
 pnpm dev
-# or
+# ou
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000) no seu navegador para ver o resultado.
 
-You can start editing the page by modifying `src/app/page.tsx`. The page auto-updates as you edit the file.
+Você pode começar editando a página modificando `src/app/[locale]/page.tsx`. A página atualiza automaticamente conforme você edita o arquivo.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Idiomas Suportados
 
-## Learn More
+- 🇧🇷 Português Brasileiro (padrão) - `/pt`
+- 🇺🇸 English - `/en`
+- 🇪🇸 Español - `/es`
 
-To learn more about Next.js, take a look at the following resources:
+## Estrutura do Projeto
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/
+│   ├── [locale]/          # Páginas internacionalizadas
+│   │   ├── page.tsx       # Página inicial
+│   │   ├── workouts/      # Página de treinos
+│   │   └── layout.tsx     # Layout com locale
+├── components/            # Componentes reutilizáveis
+├── i18n/                 # Configuração de internacionalização
+└── messages/             # Arquivos de tradução
+    ├── pt.json          # Português
+    ├── en.json          # Inglês
+    └── es.json          # Espanhol
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Grupos de Exercícios
 
-## Deploy on Vercel
+- **Pernas** - 8 exercícios incluindo agachamento, leg press, afundo
+- **Costas** - 8 exercícios incluindo puxada frontal, remada, barra fixa
+- **Peito** - 8 exercícios incluindo supino, flexão, crucifixo
+- **Bíceps** - 8 exercícios incluindo rosca direta, martelo, concentrada
+- **Tríceps** - 8 exercícios incluindo tríceps pulley, mergulho, francês
+- **Cardio** - 8 exercícios incluindo esteira, HIIT, burpees
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+O jeito mais fácil de fazer deploy da sua aplicação Next.js é usar a [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) dos criadores do Next.js.
+
+Consulte a [documentação de deployment do Next.js](https://nextjs.org/docs/app/building-your-application/deploying) para mais detalhes.
