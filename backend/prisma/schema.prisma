@@ -1,0 +1,170 @@
+// Portable schema: works with PostgreSQL and SQLite.
+// "Enums" are stored as strings (validated app-side via Zod).
+// "Aliases" stored as JSON string for portability.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // change to "sqlite" if using DATABASE_URL="file:./dev.db"
+  url      = env("DATABASE_URL")
+}
+
+model ExerciseLibrary {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  muscleGroup  String?
+  equipment    String?
+  instructions String?
+  aliases      String? // JSON-encoded array
+
+  trainingExercises TrainingExercise[]
+  workoutSets       WorkoutSet[]
+}
+
+model TrainingMethod {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  aliases     String? // JSON-encoded array
+
+  trainingExercises TrainingExercise[]
+}
+
+model TrainingBlock {
+  id         String   @id @default(cuid())
+  name       String
+  sourceFile String
+  sourceHash String
+  importedAt DateTime @default(now())
+
+  days        TrainingDay[]
+  microcycles TrainingMicrocycle[]
+  exercises   TrainingExercise[]
+  sessions    WorkoutSession[]
+  protocols   CardioProtocol[]
+
+  @@unique([sourceFile, sourceHash])
+}
+
+model TrainingDay {
+  id      String @id @default(cuid())
+  color   String // AMARELO | VERDE | VERMELHO | LARANJA | AZUL
+  label   String
+  blockId String
+  block   TrainingBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+
+  exercises TrainingExercise[]
+  sessions  WorkoutSession[]
+
+  @@unique([blockId, color])
+}
+
+model TrainingMicrocycle {
+  id      String @id @default(cuid())
+  index   Int
+  blockId String
+  block   TrainingBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+
+  exercises TrainingExercise[]
+  sessions  WorkoutSession[]
+
+  @@unique([blockId, index])
+}
+
+model TrainingExercise {
+  id              String  @id @default(cuid())
+  blockId         String
+  dayId           String
+  microcycleId    String
+  exerciseId      String?
+  exerciseNameRaw String
+  series          Int     @default(0)
+  reps            String  @default("")
+  cadence         String  @default("")
+  restSeconds     Int     @default(0)
+  methodId        String?
+  methodRaw       String  @default("")
+  observations    String  @default("")
+  orderIndex      Int
+
+  block      TrainingBlock      @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  day        TrainingDay        @relation(fields: [dayId], references: [id], onDelete: Cascade)
+  microcycle TrainingMicrocycle @relation(fields: [microcycleId], references: [id], onDelete: Cascade)
+  exercise   ExerciseLibrary?   @relation(fields: [exerciseId], references: [id])
+  method     TrainingMethod?    @relation(fields: [methodId], references: [id])
+
+  @@unique([dayId, microcycleId, orderIndex])
+}
+
+model Student {
+  id       String @id @default(cuid())
+  name     String
+  nickname String?
+
+  sessions       WorkoutSession[]
+  cardioSessions CardioSession[]
+}
+
+model WorkoutSession {
+  id              String   @id @default(cuid())
+  studentId       String
+  date            DateTime @default(now())
+  blockId         String?
+  dayId           String?
+  microcycleId    String?
+  durationMinutes Int      @default(0)
+  pse             Int      @default(0)
+  arbitraryUnits  Int      @default(0)
+  totalLoadKg     Float    @default(0)
+  notes           String   @default("")
+  status          String   @default("IN_PROGRESS") // IN_PROGRESS | FINISHED
+
+  student    Student             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  block      TrainingBlock?      @relation(fields: [blockId], references: [id])
+  day        TrainingDay?        @relation(fields: [dayId], references: [id])
+  microcycle TrainingMicrocycle? @relation(fields: [microcycleId], references: [id])
+  sets       WorkoutSet[]
+}
+
+model WorkoutSet {
+  id              String  @id @default(cuid())
+  sessionId       String
+  exerciseId      String?
+  exerciseNameRaw String
+  setNumber       Int
+  repsExecuted    Int
+  weightKg        Float
+  loadTotal       Float   @default(0)
+  notes           String  @default("")
+
+  session  WorkoutSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  exercise ExerciseLibrary? @relation(fields: [exerciseId], references: [id])
+}
+
+model CardioSession {
+  id                  String   @id @default(cuid())
+  studentId           String
+  date                DateTime @default(now())
+  cardioType          String   // CONTINUOUS | INTERVALS
+  equipment           String   // ESCADA | BICICLETA | ESTEIRA | OUTRO
+  durationMinutes     Int
+  intensity           String
+  pse                 Int
+  intervalsCount      Int?
+  intervalDurationSec Int?
+  notes               String   @default("")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+// Cardio protocols imported from Excel (read-only reference in /plans)
+model CardioProtocol {
+  id              String @id @default(cuid())
+  blockId         String
+  microcycleIndex Int
+  equipment       String
+  description     String
+  block           TrainingBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+}
