@@ -12,9 +12,157 @@ App local de musculação + cardio básico, focado em extensibilidade. Sem deplo
 - **Excel parser:** `xlsx`
 
 ## Pré-requisitos
-- Node.js 20+
-- npm 10+
-- (Opcional) Docker Desktop, se você for usar PostgreSQL local via `docker compose`
+- **Git** 2.40+
+- **Node.js 20+ LTS** (vem com `npm` 10+)
+- **Docker** (opcional, recomendado para Postgres local) — alternativa: SQLite
+- Editor de código (VS Code recomendado)
+
+---
+
+## Instalação da stack
+
+### 🪟 Windows 10/11
+
+#### Opção A — Instaladores oficiais (mais simples)
+
+1. **Git for Windows**
+   - Baixe: <https://git-scm.com/download/win>
+   - Use as opções padrão. Verifique:
+     ```powershell
+     git --version
+     ```
+
+2. **Node.js 20 LTS**
+   - Baixe o instalador MSI (LTS): <https://nodejs.org/en/download>
+   - Após instalar, abra um **novo** PowerShell e verifique:
+     ```powershell
+     node -v   # v20.x
+     npm -v    # 10.x
+     ```
+
+3. **Docker Desktop** (opcional, recomendado)
+   - Baixe: <https://www.docker.com/products/docker-desktop/>
+   - Requer **WSL 2** habilitado. Se não tiver, rode em PowerShell **como Administrador**:
+     ```powershell
+     wsl --install
+     ```
+     Reinicie. Abra o Docker Desktop e aguarde inicializar. Verifique:
+     ```powershell
+     docker --version
+     docker compose version
+     ```
+
+4. **(Opcional) GitHub CLI** — para clonar via `gh`:
+   ```powershell
+   winget install --id GitHub.cli
+   gh auth login
+   ```
+
+#### Opção B — winget (linha de comando, mais rápido)
+
+Em PowerShell:
+```powershell
+winget install --id Git.Git -e
+winget install --id OpenJS.NodeJS.LTS -e
+winget install --id Docker.DockerDesktop -e
+winget install --id GitHub.cli -e
+# Feche e reabra o terminal para atualizar o PATH
+```
+
+#### Opção C — Chocolatey
+
+```powershell
+# Em PowerShell como Administrador (instala o Choco se não tiver)
+Set-ExecutionPolicy Bypass -Scope Process -Force; `
+  iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+choco install -y git nodejs-lts docker-desktop gh
+```
+
+---
+
+### 🐧 Linux
+
+#### Ubuntu / Debian
+
+```bash
+# Git
+sudo apt update && sudo apt install -y git curl ca-certificates
+
+# Node.js 20 LTS (via NodeSource)
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+node -v && npm -v
+
+# Docker Engine + Compose plugin
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Permitir docker sem sudo (re-login depois)
+sudo usermod -aG docker $USER
+
+# (Opcional) GitHub CLI
+sudo apt install -y gh   # ou: https://cli.github.com/
+```
+
+> Para outras distros (Debian puro, Pop!_OS, Mint), os comandos são equivalentes — apenas troque o repo `ubuntu` pelo `debian` no Docker quando aplicável.
+
+#### Fedora / RHEL
+
+```bash
+sudo dnf install -y git curl
+# Node.js 20 LTS
+curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
+sudo dnf install -y nodejs
+
+# Docker
+sudo dnf -y install dnf-plugins-core
+sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER
+```
+
+#### Arch / Manjaro
+
+```bash
+sudo pacman -Syu --needed git nodejs npm docker docker-compose github-cli
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER
+```
+
+#### Alternativa multiplataforma — `nvm` (recomendado para gerenciar versões do Node)
+
+Linux/macOS:
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+# Reabra o terminal
+nvm install 20
+nvm use 20
+```
+
+Windows: use [`nvm-windows`](https://github.com/coreybutler/nvm-windows/releases) ou `winget install CoreyButler.NVMforWindows`.
+
+---
+
+### ✅ Verificação rápida (Windows ou Linux)
+
+```bash
+git --version            # >= 2.40
+node -v                  # v20.x
+npm -v                   # >= 10
+docker --version         # opcional
+docker compose version   # opcional
+```
+
+---
 
 ## Setup rápido
 
